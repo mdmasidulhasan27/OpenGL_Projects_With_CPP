@@ -40,15 +40,16 @@ typedef struct
 
 #define BULLETS 100
 
-Bullet bullet[BULLETS];
+Bullet bulletJet1[BULLETS];
+Bullet bulletJet2[BULLETS];
 
-int allocBullet(void)
+int allocBulletJet1(void)
 {
     int i;
 
     for (i=0; i<BULLETS; i++)
     {
-        if (!bullet[i].inuse)
+        if (!bulletJet1[i].inuse)
         {
             return i;
         }
@@ -56,58 +57,58 @@ int allocBullet(void)
     return -1;
 }
 
-void initBullet(int i, int time)
+void initBulletJet1(int i, int time)
 {
     float c = cos(angle*M_PI/180.0);
     float s = sin(angle*M_PI/180.0);
 
-    bullet[i].inuse = 1;
-    bullet[i].x = x + 3.5 * c;
-    bullet[i].y = y + 3.5 * s;
-    bullet[i].v = 0.025;
-    bullet[i].xv = xv + c * bullet[i].v;
-    bullet[i].yv = yv + s * bullet[i].v;
-    bullet[i].expire = time + 600;
+    bulletJet1[i].inuse = 1;
+    bulletJet1[i].x = x + 3.5 * c;
+    bulletJet1[i].y = y + 3.5 * s;
+    bulletJet1[i].v = 0.025;
+    bulletJet1[i].xv = xv + c * bulletJet1[i].v;
+    bulletJet1[i].yv = yv + s * bulletJet1[i].v;
+    bulletJet1[i].expire = time + 600;
 }
 
-void advanceBullets(int delta, int time)
+void advanceBulletsJet1(int delta, int time)
 {
     int i;
 
     for (i=0; i<BULLETS; i++)
     {
-        if (bullet[i].inuse)
+        if (bulletJet1[i].inuse)
         {
             float x, y;
 
-            if (time > bullet[i].expire)
+            if (time > bulletJet1[i].expire)
             {
-                bullet[i].inuse = 0;
+                bulletJet1[i].inuse = 0;
                 continue;
             }
-            x = bullet[i].x + bullet[i].xv * delta;
-            y = bullet[i].y + bullet[i].yv * delta;
+            x = bulletJet1[i].x + bulletJet1[i].xv * delta;
+            y = bulletJet1[i].y + bulletJet1[i].yv * delta;
             x = x / 40.0;
-            bullet[i].x = (x - floor(x))*40.0;
+            bulletJet1[i].x = (x - floor(x))*40.0;
             y = y / 40.0;
-            bullet[i].y = (y - floor(y))*40.0;
+            bulletJet1[i].y = (y - floor(y))*40.0;
         }
     }
 
 }
 
-void shotBullet(void)
+void shotBulletJet1(void)
 {
     int entry;
 
-    entry = allocBullet();
+    entry = allocBulletJet1();
     if (entry >= 0)
     {
-        initBullet(entry, glutGet(GLUT_ELAPSED_TIME));
+        initBulletJet1(entry, glutGet(GLUT_ELAPSED_TIME));
     }
 }
 
-void drawBullets(void)
+void drawBulletsJet1(void)
 {
     int i;
 
@@ -115,12 +116,90 @@ void drawBullets(void)
     glColor3f(1.0, 0.0, 1.0);
     for (i=0; i<BULLETS; i++)
     {
-        if (bullet[i].inuse)
+        if (bulletJet1[i].inuse)
         {
-            glVertex2f(bullet[i].x, bullet[i].y);
+            glVertex2f(bulletJet1[i].x, bulletJet1[i].y);
         }
     }
 
+    glEnd();
+}
+
+int allocBulletJet2(void)
+{
+    int i;
+
+    for (i=0; i<BULLETS; i++)
+    {
+        if (!bulletJet2[i].inuse)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void initBulletJet2(int i, int time)
+{
+    float c = cos(angle*M_PI/180.0);
+    float s = sin(angle*M_PI/180.0);
+
+    bulletJet2[i].inuse = 1;
+    bulletJet2[i].x = x + 3.5 * c;
+    bulletJet2[i].y = y + 3.5 * s;
+    bulletJet2[i].v = 0.025;
+    bulletJet2[i].xv = xv + c * bulletJet2[i].v;
+    bulletJet2[i].yv = yv + s * bulletJet2[i].v;
+    bulletJet2[i].expire = time + 600;
+}
+
+void advanceBulletsJet2(int delta, int time)
+{
+    int i;
+
+    for (i=0; i<BULLETS; i++)
+    {
+        if (bulletJet2[i].inuse)
+        {
+            float x, y;
+            if (time > bulletJet2[i].expire)
+            {
+                bulletJet2[i].inuse = 0;
+                continue;
+            }
+            x = bulletJet2[i].x + bulletJet2[i].xv * delta;
+            y = bulletJet2[i].y + bulletJet2[i].yv * delta;
+            x = x / 40.0;
+            bulletJet2[i].x = (x - floor(x))*40.0;
+            y = y / 40.0;
+            bulletJet2[i].y = (y - floor(y))*40.0;
+        }
+    }
+}
+
+void shotBulletJet2(void)
+{
+    int entry;
+
+    entry = allocBulletJet2();
+    if (entry >= 0)
+    {
+        initBulletJet2(entry, glutGet(GLUT_ELAPSED_TIME));
+    }
+}
+
+void drawBulletsJet2(void)
+{
+    int i;
+    glBegin(GL_POINTS);
+    glColor3f(1.0, 0.0, 1.0);
+    for (i=0; i<BULLETS; i++)
+    {
+        if (bulletJet2[i].inuse)
+        {
+            glVertex2f(bulletJet2[i].x, bulletJet2[i].y);
+        }
+    }
     glEnd();
 }
 
@@ -185,7 +264,7 @@ void display(void)
 {
     glClear(GL_COLOR_BUFFER_BIT);
     drawJet(angle);
-    drawBullets();
+    drawBulletsJet1();
     glutSwapBuffers();
 }
 
@@ -228,7 +307,7 @@ void idle(void)
     y = y / 40.0;
     y = (y - floor(y))*40.0;
     lastTime = time;
-    advanceBullets(delta, time);
+    advanceBulletsJet1(delta, time);
     glutPostWindowRedisplay(currentWindow);
 }
 
@@ -301,7 +380,7 @@ void key(unsigned char key, int px, int py)
         }
         break;
     case ' ':
-        shotBullet();
+        shotBulletJet1();
         break;
     }
 }

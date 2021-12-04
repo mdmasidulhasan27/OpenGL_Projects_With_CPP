@@ -659,46 +659,29 @@ void mainMenu()
     int menuX=200;
     text(90,580,0,"________GAME________",.5,1,.8);
     text(90,550,0,"_PROTECT The EARTH_",.5,1,.8);
+    if(oldGame)
+            text(10,menuX+120,1,"Continue",1,1,1);
+    text(10,menuX+90,1,"Play New Game",1,1,1);
+    text(10,menuX+60,1,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],1,1,1);
+    text(10,menuX+30,1,"Back Ground: "+backGroundSt[backGround],1,1,1);
+    text(10,menuX+0,1,"Quit Game",1,1,1);
     switch(mainMenuSelection)
     {
     case 0:
-        if(oldGame)
+        if(oldGame){
             text(10,menuX+120,0,"Continue",0,1,1);
-        text(10,menuX+90,1,"Play New Game",1,1,1);
-        text(10,menuX+60,1,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],1,1,1);
-        text(10,menuX+30,1,"Back Ground: "+backGroundSt[backGround],1,1,1);
-        text(10,menuX+0,1,"Quit Game",1,1,1);
+        }
         break;
     case 1:
-        if(oldGame)
-            text(10,menuX+120,1,"Continue",1,1,1);
         text(10,menuX+90,0,"Play New Game",0,1,1);
-        text(10,menuX+60,1,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],1,1,1);
-        text(10,menuX+30,1,"Back Ground: "+backGroundSt[backGround],1,1,1);
-        text(10,menuX+0,1,"Quit Game",1,1,1);
         break;
     case 2:
-        if(oldGame)
-            text(10,menuX+120,1,"Continue",1,1,1);
-        text(10,menuX+90,1,"Play New Game",1,1,1);
         text(10,menuX+60,0,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],0,1,1);
-        text(10,menuX+30,1,"Back Ground: "+backGroundSt[backGround],1,1,1);
-        text(10,menuX+0,1,"Quit Game",1,1,1);
         break;
     case 3:
-        if(oldGame)
-            text(10,menuX+120,1,"Continue",1,1,1);
-        text(10,menuX+90,1,"Play New Game",1,1,1);
-        text(10,menuX+60,1,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],1,1,1);
         text(10,menuX+30,0,"Back Ground: "+backGroundSt[backGround],0,1,1);
-        text(10,menuX+0,1,"Quit Game",1,1,1);
         break;
     case 4:
-        if(oldGame)
-            text(10,menuX+120,1,"Continue",1,1,1);
-        text(10,menuX+90,1,"Play New Game",1,1,1);
-        text(10,menuX+60,1,"Select Level: "+gameLevelSt[(nAsteroid/2)-1],1,1,1);
-        text(10,menuX+30,1,"Back Ground: "+backGroundSt[backGround],1,1,1);
         text(10,menuX+0,0,"Quit Game",0,1,1);
         break;
     }
@@ -849,6 +832,9 @@ static void key(unsigned char key, int x, int y)
     case 27:
         exit(0);
         break;
+    case 13:
+        spaceKey();
+        break;
     case '=':
         if(gameSpeed<10)
             gameSpeed++;
@@ -880,6 +866,16 @@ void init (void)
     starGenerate();
     asteroidGenerate();
     bltGenerate();
+    //GRAPHICS QUALITY
+	glEnable(GL_POINT_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_POLYGON_SMOOTH);
+	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_MULTISAMPLE);
 }
 
 int main(int argc, char *argv[])

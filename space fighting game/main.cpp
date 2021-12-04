@@ -14,7 +14,7 @@ GLuint textureID[num_textures];
 void DrawTexturedRect(int x,int y,int w,int h,GLuint texture,unsigned int fading,unsigned int i,unsigned int ill_change);
 unsigned int fade_color[num_textures],fade_swap[num_textures];
 
-unsigned char display_screen=0;  //Type Of Interface To Display
+unsigned char display_screen=1;  //Type Of Interface To Display
 
 void opengl_info(void);
 char gl_info_string[6][50];
@@ -252,7 +252,7 @@ int main(int argc,char **argv)
 	}
 
 //NEW GAME
-	new_game_initialization();
+	//new_game_initialization();
 
 //AREA OF TRIANGULAR SHUTTLE
 	shuttle_area=triangle_area(shuttle_x_pos,shuttle_y_pos,shuttle_x_pos+25.0,shuttle_y_pos+21.6506350946,shuttle_x_pos+50.0,shuttle_y_pos);
@@ -385,7 +385,7 @@ void render(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		if(display_screen==2)game_screen();
-		else if(display_screen==0)splash_screen();
+		//else if(display_screen==0)splash_screen();
 		else if(display_screen==1)main_menu_screen();
 		else if(display_screen==3)options_screen();
 		else if(display_screen==4)paused_screen();
@@ -1095,10 +1095,10 @@ void circular_aliens(void)
     		{
     			if(sh_bullet[j].allocated==1 && (pow(cir_alien[i].alien_initial_x_pos-sh_bullet[j].x_pos,2)+pow(cir_alien[i].alien_initial_y_pos-sh_bullet[j].y_pos,2))<=pow(r,2))  //Thank You Pythagoras :)
     			{
-    				cir_alien[i].alien_hitpoints=cir_alien[i].alien_hitpoints-1;
-    				cir_alien[i].i_got_hit=cir_alien[i].i_got_hit+5;
+    				cir_alien[i].alien_hitpoints-=1;
+    				cir_alien[i].i_got_hit+=5;
     		    	sh_bullet[j].allocated=0;
-    		    	game_score=game_score+difficulty_score_multiplier;
+    		    	game_score+=difficulty_score_multiplier;
     		    }
     		}
 //DRAW CIRCULAR ALIENS

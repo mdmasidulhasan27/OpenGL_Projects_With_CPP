@@ -914,3 +914,14 @@
 	<string>
 	<GL/glut.h>
 
+1633981645 source:d:\opengl_projects_with_cpp\protect earth (game) v3\main.cpp
+	<GLUT/glut.h>
+	<GL/glut.h>
+	<stdlib.h>
+	<stdio.h>
+	<math.h>
+	<sstream>
+	<iostream>
+	<string>
+	<GL/glut.h>
+

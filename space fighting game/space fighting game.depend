@@ -923,3 +923,14 @@
 
 1627287859 e:\space fighting game\textures.c
 
+1627300052 source:d:\opengl_projects_with_cpp\space fighting game\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	<time.h>
+	<GL/freeglut.h>
+	"textures.c"
+
+1627287859 d:\opengl_projects_with_cpp\space fighting game\textures.c
+

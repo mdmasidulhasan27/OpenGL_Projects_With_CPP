@@ -99,6 +99,8 @@ static void display(void)
     glutSwapBuffers();
 }
 
+
+
 static void key(unsigned char key, int x, int y)
 {
     switch (key)
@@ -110,15 +112,14 @@ static void key(unsigned char key, int x, int y)
 
         case '+':
             if(nNode<480)
-                nNode+=10;
+                nNode+=50;
             break;
 
         case '-':
             if(nNode>20)
-                nNode-+10;
+                nNode-+50;
             break;
     }
-
     glutPostRedisplay();
 }
 
@@ -142,6 +143,16 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(key);
     glutIdleFunc(idle);
+
+    //graphics
+    glEnable(GL_POINT_SMOOTH);
+	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_POLYGON_SMOOTH);
+	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
     glClearColor(0,0,0,1);
     glEnable(GL_CULL_FACE);

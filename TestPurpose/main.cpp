@@ -19,32 +19,35 @@
 #define borderMin 1.0
 #define numberOfStars 100
 #define BULLETS 100
-
+//functions
+void machinePlay();
+void idle();
+void controlLogics();
 struct Jet
 {
-    float angle;
+    double angle;
     int left, leftTime;
     int right, rightTime;
     int thrust, thrustTime;
     int sheild, sheildTime;
-    float x, y, xv, yv, v;
+    double x, y, xv, yv, v;
     int life;
-    float score;
+    double score;
 } Jet1,Jet2;
 
 typedef struct
 {
     int inuse;
-    float x, y;
-    float v;
-    float xv, yv;
+    double x, y;
+    double v;
+    double xv, yv;
     int expire;
 } Bullet;
 
 struct star
 {
-    float starX;
-    float starY;
+    double starX;
+    double starY;
 } stars[numberOfStars];
 Bullet bulletJet1[BULLETS];
 Bullet bulletJet2[BULLETS];
@@ -56,10 +59,13 @@ int lastTime;
 int paused = 0, resuming = 1;
 int originalWindow = 0, currentWindow;
 int pageNo = 0, mainMenuSelect=1, backGround=1;
-int winner = 0;
-int gameMode = 1; //0 for pause, 1 for play
-string backGroundSt[]= {"Off","on"}, gameLevelSt[]= {"Low","Medium","High"};
+int gameMode=0;//0 single Player, 1 Multi Player
+int winner = 0;//0 draw, 1 yellow, 2 pink
+int playPause = 1; //0 for pause, 1 for play
+string backGroundSt[]= {"Off","on"}, gameModeSt[]= {"Single Player","Multi Player"};
 
+
+///Stars
 void starGenerate()
 {
     for(int i=0; i<numberOfStars; i++)
@@ -82,6 +88,7 @@ void starsDisplay()
     glEnd();
 }
 
+///Bullets
 int allocBulletJet1(void)
 {
     int i;
@@ -163,6 +170,8 @@ void drawBulletsJet1(void)
                 //printf("Jet 1 hitted\n");
                 bulletJet1[i].inuse=0;
                 Jet2.life--;
+                Jet2.score /= 1.5;
+                Jet1.score *= 1.5;
             }
         }
     }
@@ -232,11 +241,6 @@ void shotBulletJet2(void)
     }
 }
 
-double triArea(double x0, double y0, double x1, double y1, double x2, double y2)
-{
-    return ((x0*(y1-y2)) + (x1*(y2-y0)) + (x2*(y0-y1)))/2.0;
-}
-
 void drawBulletsJet2(void)
 {
     int i;
@@ -251,16 +255,17 @@ void drawBulletsJet2(void)
             glVertex2f(b2x, b2y);
             if((j1x<b2x && j1x+1.25>b2x && j1y<b2y && j1y+1.25>b2y) || (j1x>b2x && j1x-1.25<b2x && j1y>b2y && j1y-1.25<b2y))
             {
-                //printf("Jet 1 hitted\n");
                 bulletJet2[i].inuse=0;
                 Jet1.life--;
+                Jet2.score *= 1.5;
+                Jet1.score /= 1.5;
             }
         }
     }
     glEnd();
 }
 
-
+///Jets
 void jet1StartingPosition(void)
 {
     Jet1.angle = 0.0;
@@ -268,6 +273,12 @@ void jet1StartingPosition(void)
     Jet1.y=windowY/2;
     Jet1.xv=0;
     Jet1.yv=0;
+    Jet1.leftTime=0;
+    Jet1.rightTime=0;
+    Jet1.thrustTime=0;
+    Jet1.thrust=0;
+    Jet1.left=0;
+    Jet1.right=0;
 }
 
 void jet2StartingPosition(void)
@@ -277,6 +288,12 @@ void jet2StartingPosition(void)
     Jet2.y=windowY/2;
     Jet2.xv=0;
     Jet2.yv=0;
+    Jet2.leftTime=0;
+    Jet2.rightTime=0;
+    Jet2.thrustTime=0;
+    Jet2.thrust=0;
+    Jet2.left=0;
+    Jet2.right=0;
 }
 
 void jetsStartingPosition(int jetN)
@@ -397,11 +414,18 @@ void titleBar(void)
 {
     float dis=0;
     glBegin(GL_QUADS);
-    glColor3ub(255,0,0);
+    glColor3ub(255,255,255);
     glVertex2f(0.0,windowY-2);
     glVertex2f(0.0,windowY);
     glVertex2f(windowX,windowY);
     glVertex2f(windowX,windowY-2);
+    glEnd();
+    glBegin(GL_QUADS);
+    glColor3ub(255,255,255);
+    glVertex2f(0.1,windowY-1.9);
+    glVertex2f(0.1,windowY-.1);
+    glVertex2f(windowX-.1,windowY-.1);
+    glVertex2f(windowX-.1,windowY-1.9);
     glEnd();
     //Jet 2 score board:
     glBegin(GL_QUADS);
@@ -449,42 +473,42 @@ void mainMenu()
     switch(mainMenuSelect)
     {
     case 0:
-        if(gameMode==0)
+        if(playPause==0)
             text(10,20,"Continue",5,1,1,1);
         text(10,18,"Play New Game",4,0,1,1);
-        text(10,16,"Select Level",4,0,1,1);
+        text(10,16,"Mode: "+gameModeSt[gameMode],4,0,1,1);
         text(10,14,"Back Ground: "+backGroundSt[backGround],4,0,1,1);
         text(10,12,"Quit Game",4,0,1,1);
         break;
     case 1:
-        if(gameMode==0)
+        if(playPause==0)
             text(10,20,"Continue",4,0,1,1);
         text(10,18,"Play New Game",5,1,1,1);
-        text(10,16,"Select Level",4,0,1,1);
+        text(10,16,"Mode: "+gameModeSt[gameMode],4,0,1,1);
         text(10,14,"Back Ground: "+backGroundSt[backGround],4,0,1,1);
         text(10,12,"Quit Game",4,0,1,1);
         break;
     case 2:
-        if(gameMode==0)
+        if(playPause==0)
             text(10,20,"Continue",4,0,1,1);
         text(10,18,"Play New Game",4,0,1,1);
-        text(10,16,"Select Level",5,1,1,1);
+        text(10,16,"Mode: "+gameModeSt[gameMode],5,1,1,1);
         text(10,14,"Back Ground: "+backGroundSt[backGround],4,0,1,1);
         text(10,12,"Quit Game",4,0,1,1);
         break;
     case 3:
-        if(gameMode==0)
+        if(playPause==0)
             text(10,20,"Continue",4,0,1,1);
         text(10,18,"Play New Game",4,0,1,1);
-        text(10,16,"Select Level",4,0,1,1);
+        text(10,16,"Mode: "+gameModeSt[gameMode],4,0,1,1);
         text(10,14,"Back Ground: "+backGroundSt[backGround],5,1,1,1);
         text(10,12,"Quit Game",4,0,1,1);
         break;
     case 4:
-        if(gameMode==0)
+        if(playPause==0)
             text(10,20,"Continue",4,0,1,1);
         text(10,18,"Play New Game",4,0,1,1);
-        text(10,16,"Select Level",4,0,1,1);
+        text(10,16,"Mode: "+gameModeSt[gameMode],4,0,1,1);
         text(10,14,"Back Ground: "+backGroundSt[backGround],4,0,1,1);
         text(10,12,"Quit Game",5,1,1,1);
         break;
@@ -493,6 +517,8 @@ void mainMenu()
 
 void display(void)
 {
+    if(gameMode==0)
+        machinePlay();
     glClear(GL_COLOR_BUFFER_BIT);
     if(backGround)
         starsDisplay();
@@ -501,9 +527,11 @@ void display(void)
     case 0:
         //menu Page
         mainMenu();
+        glutIdleFunc(NULL);
         break;
     case 1:
         //game page
+        glutIdleFunc(idle);
         drawBulletsJet1();
         drawBulletsJet2();
         drawJet1(Jet1.angle);
@@ -519,42 +547,43 @@ void display(void)
             break;
         case 1:
             text(14,24,"###  Yellow is Winner  ###",5,1,1,0);
-            text(14,22,"        Point: "+to_string(Jet1.score),5,1,1,0);
+            text(14,22,"        Point: "+to_string(int(Jet1.score)),5,1,1,0);
             break;
         case 2:
             text(14,24,"###  Pink is Winner  ###",5,1,0,1);
-            text(14,22,"        Point: "+to_string(Jet2.score),5,1,0,1);
+            text(14,22,"        Point: "+to_string(int(Jet2.score)),5,1,0,1);
             break;
         }
         text(14,4,"press 'enter' for main menu",4,1,1,1);
+        glutIdleFunc(NULL);
         break;
     }
     border();
-    //glutPostRedisplay();
+    glutPostRedisplay();
     glutSwapBuffers();
 }
 
-void controlLogics(void)
+void controlLogics(int work)
 {
     int time, delta;
     time = glutGet(GLUT_ELAPSED_TIME);
     delta = time - lastTime;
-    if (!gameMode)
+    //delta = time - lastTime;
+    if (!work)
     {
         lastTime = time;
-        gameMode = 1;
     }
-    //JET1:
+    ///JET1:
     if (Jet1.left)
     {
         delta = time - Jet1.leftTime;
-        Jet1.angle = Jet1.angle + delta * 0.4;
+        Jet1.angle = Jet1.angle + delta * 0.3;
         Jet1.leftTime = time;
     }
     if (Jet1.right)
     {
         delta = time - Jet1.rightTime;
-        Jet1.angle = Jet1.angle - delta * 0.4;
+        Jet1.angle = Jet1.angle - delta * 0.3;
         Jet1.rightTime = time;
     }
     if (Jet1.thrust)
@@ -565,17 +594,17 @@ void controlLogics(void)
         Jet1.yv = Jet1.yv + sin(Jet1.angle*M_PI/180.0) * Jet1.v;
         Jet1.thrustTime = time;
     }
-
+    ///JET2:
     if (Jet2.left)
     {
         delta = time - Jet2.leftTime;
-        Jet2.angle = Jet2.angle + delta * 0.4;
+        Jet2.angle = Jet2.angle + delta * 0.3;
         Jet2.leftTime = time;
     }
     if (Jet2.right)
     {
         delta = time - Jet2.rightTime;
-        Jet2.angle = Jet2.angle - delta * 0.4;
+        Jet2.angle = Jet2.angle - delta * 0.3;
         Jet2.rightTime = time;
     }
     if (Jet2.thrust)
@@ -622,12 +651,12 @@ void gameLogic()
     if(Jet1.thrust)
     {
         if(Jet1.score<=1000)
-            Jet1.score+=(positive(Jet1.xv)+positive(Jet1.yv));
+            Jet1.score+=Jet1.thrust/100.0;
     }
     if(Jet2.thrust)
     {
         if(Jet2.score<=1000)
-            Jet2.score+=(positive(Jet2.xv)+positive(Jet2.yv));
+            Jet2.score+=Jet2.thrust/100.0;
     }
     if(Jet1.life==0 || Jet2.life==0 || Jet1.score>=1000 || Jet2.score>=1000)
     {
@@ -650,19 +679,25 @@ void gameLogic()
 
 void idle(void)
 {
-    if(gameMode==1)
+    if(playPause==1)
     {
         gameLogic();
-        controlLogics();
+        controlLogics(1);
     }
-    glutPostWindowRedisplay(currentWindow);
+    else
+    {
+        controlLogics(0);
+    }
+    //glutPostWindowRedisplay(currentWindow);
+    //glutPostRedisplay();
+    //glutSwapBuffers();
 }
 
 void visible(int vis)
 {
     if (vis == GLUT_VISIBLE)
     {
-        if (!paused)
+        if (playPause)
         {
             glutIdleFunc(idle);
         }
@@ -681,16 +716,23 @@ void enter()
         switch(mainMenuSelect)
         {
         case 0:
-            gameMode = 1;
+            playPause = 1;
             pageNo = 1;
             break;
         case 1:
-            gameMode = 1;
+            playPause = 1;
             pageNo=1;
             jetsStartingPosition(3);
             break;
         case 2:
-
+            if(gameMode){
+                gameMode=0;
+                Jet2.thrust=0;
+                Jet2.left=0;
+                Jet2.right=0;
+            }
+            else
+                gameMode=1;
             break;
         case 3:
             if(backGround)
@@ -704,18 +746,88 @@ void enter()
         }
         break;
     case 1:
-        gameMode=0;
+        playPause=0;
         pageNo=0;
         mainMenuSelect=0;
         break;
     case 2:
         //game over page
         pageNo=0;
-        gameMode=1;
+        playPause=1;
         mainMenuSelect=1;
         jetsStartingPosition(3);
         break;
     }
+}
+
+double getAngle(double y1, double y2, double x1, double x2)
+{
+    double angle = (y2-y1)/(x2-x1);
+    angle = atan(angle);
+    angle = angle *(180/3.14159265359);
+    if(angle<0)
+        angle *= -1;
+    return angle;
+}
+double pointsDistance()
+{
+    return sqrt(pow((Jet1.x-Jet2.x),2)+ pow((Jet1.y-Jet2.y),2));
+}
+
+void machinePlay()
+{
+    double angle;
+    double distance = pointsDistance();
+    if(Jet1.x<Jet2.x && Jet1.y<=Jet2.y)
+    {
+        //left bottom
+        angle = getAngle(Jet1.y, Jet2.y, Jet1.x, Jet2.x);
+    }
+    else if(Jet1.x>=Jet2.x && Jet1.y<Jet2.y)
+    {
+        //right bottom
+        angle = getAngle(Jet1.x, Jet2.x, Jet1.y, Jet2.y)+90;
+    }
+    else if(Jet1.x>Jet2.x && Jet1.y>=Jet2.y)
+    {
+        //right top
+        angle = getAngle(Jet1.y, Jet2.y, Jet1.x, Jet2.x)+180;
+    }
+    else if(Jet1.x<=Jet2.x && Jet1.y>Jet2.y)
+    {
+        //left top
+        angle = getAngle(Jet1.x, Jet2.x, Jet1.y, Jet2.y)+270;
+    }
+
+    int jet2Angle = Jet2.angle;
+    jet2Angle=abs(jet2Angle);
+    jet2Angle %= 360;
+    printf("%.1lf\n",distance);
+    if(angle==jet2Angle)
+    {
+        Jet2.left = 0;
+        Jet2.right = 0;
+    }
+    else if(jet2Angle<=(360-angle))
+    {
+        Jet2.right = 1;
+        Jet2.rightTime = glutGet(GLUT_ELAPSED_TIME);
+        Jet2.left = 0;
+    }
+    else if(jet2Angle>=(360-angle))
+    {
+        Jet2.left = 1;
+        Jet2.leftTime = glutGet(GLUT_ELAPSED_TIME);
+        Jet2.right = 0;
+    }
+    if(distance>15.0){
+        Jet2.thrust=1;
+        Jet2.thrustTime = glutGet(GLUT_ELAPSED_TIME);
+    }
+    else{
+        Jet2.thrust=0;
+    }
+
 }
 
 void key(unsigned char key, int px, int py)
@@ -724,9 +836,6 @@ void key(unsigned char key, int px, int py)
     {
     case 27:
         exit(0);
-        break;
-    case ' ':
-        //shotBulletJet1();
         break;
     case 'w':
         Jet2.thrust = 1;
@@ -781,7 +890,7 @@ void special(int key, int x, int y)
     case GLUT_KEY_UP:
         if(pageNo==0)
         {
-            if(gameMode==0 && mainMenuSelect>0)
+            if(playPause==0 && mainMenuSelect>0)
                 mainMenuSelect--;
             else if(mainMenuSelect>1)
                 mainMenuSelect--;

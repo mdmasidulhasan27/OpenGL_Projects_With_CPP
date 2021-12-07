@@ -1538,7 +1538,7 @@ void myinit()
 int main(int argc, char* argv[])
 
 {
-    printf("OpenGL Project By Shadman & Roni\n");
+    printf("OpenGL Project\n");
     printf("\n------------------------------------------------------------------\n");
     printf("Hit Enter\n");
     getchar();
